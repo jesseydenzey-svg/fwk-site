@@ -1,24 +1,24 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowLeft, MessageCircle, ShoppingBag, Trash2 } from "lucide-react";
+import { ArrowLeft, Minus, MessageCircle, Plus, ShoppingBag, Trash2 } from "lucide-react";
 import SiteHeader from "@/components/site-header";
 import { useCart } from "@/components/cart-provider";
 import { formatPrice } from "@/lib/catalogue";
 import { getWhatsAppNumber } from "@/lib/whatsapp";
 
 export default function CartPage() {
-  const { items, ready, removeItem } = useCart();
+  const { items, ready, removeItem, updateQuantity } = useCart();
 
-  const total = items.reduce((sum, item) => sum + (item.price ?? 0), 0);
+  const total = items.reduce((sum, item) => sum + (item.price ?? 0) * item.quantity, 0);
 
   const whatsappNumber = getWhatsAppNumber();
   const orderSummary = items
     .map(
       (item, idx) =>
-        `${idx + 1}. ${item.name}${item.modelName ? ` (${item.modelName})` : ""}${
+        `${idx + 1}. ${item.name} x${item.quantity}${item.modelName ? ` (${item.modelName})` : ""}${
           item.customization ? ` [Personnalisation : ${item.customization}]` : ""
-        } - ${formatPrice(item.price)}`
+        } - ${formatPrice((item.price ?? 0) * item.quantity)}`
     )
     .join("\n");
 
@@ -74,7 +74,6 @@ export default function CartPage() {
           </div>
         ) : (
           <div className="mt-8 grid gap-8 lg:grid-cols-3">
-            {/* Liste des articles */}
             <div className="space-y-4 lg:col-span-2">
               {items.map((item) => (
                 <div
@@ -96,9 +95,35 @@ export default function CartPage() {
                         {item.customization}
                       </p>
                     )}
-                    <p className="mt-3 font-heading text-lg font-bold text-white">
-                      {formatPrice(item.price)}
-                    </p>
+
+                    <div className="mt-3 flex items-center gap-3">
+                      <div className="flex items-center gap-1 rounded-xl border border-white/15 bg-[var(--surface-strong)] p-1">
+                        <button
+                          type="button"
+                          onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                          disabled={item.quantity <= 1}
+                          aria-label="Diminuer la quantité"
+                          className="flex size-9 items-center justify-center rounded-lg text-white transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-30"
+                        >
+                          <Minus size={16} />
+                        </button>
+                        <span className="w-8 text-center text-sm font-bold text-white">
+                          {item.quantity}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                          aria-label="Augmenter la quantité"
+                          className="flex size-9 items-center justify-center rounded-lg text-white transition hover:bg-white/10"
+                        >
+                          <Plus size={16} />
+                        </button>
+                      </div>
+
+                      <p className="font-heading text-lg font-bold text-white">
+                        {formatPrice((item.price ?? 0) * item.quantity)}
+                      </p>
+                    </div>
                   </div>
 
                   <button
@@ -113,7 +138,6 @@ export default function CartPage() {
               ))}
             </div>
 
-            {/* Récapitulatif commande */}
             <div className="lg:col-span-1">
               <div className="rounded-2xl border border-white/10 bg-[var(--surface)] p-6">
                 <h2 className="font-heading text-xl font-bold uppercase text-white">
@@ -123,7 +147,9 @@ export default function CartPage() {
                 <div className="mt-4 space-y-2 border-b border-white/10 pb-4 text-sm">
                   <div className="flex justify-between text-[var(--muted)]">
                     <span>Nombre d&apos;articles</span>
-                    <span className="font-bold text-white">{items.length}</span>
+                    <span className="font-bold text-white">
+                      {items.reduce((sum, item) => sum + item.quantity, 0)}
+                    </span>
                   </div>
                   <div className="flex justify-between text-[var(--muted)]">
                     <span>Livraison</span>
@@ -155,7 +181,6 @@ export default function CartPage() {
         )}
       </main>
 
-      {/* Action ancrée en bas sur MOBILE si panier non vide */}
       {ready && items.length > 0 && (
         <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-white/10 bg-[#0E1116]/95 p-4 backdrop-blur-md sm:hidden">
           <div className="flex items-center gap-4">

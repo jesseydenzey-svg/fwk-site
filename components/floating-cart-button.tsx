@@ -9,7 +9,7 @@ import { useCart } from "@/components/cart-provider";
 export default function FloatingCartButton() {
   const pathname = usePathname();
   const { items, ready } = useCart();
-  const count = ready ? items.length : 0;
+  const count = ready ? items.reduce((sum, item) => sum + item.quantity, 0) : 0;
   const [bump, setBump] = useState(false);
 
   useEffect(() => {

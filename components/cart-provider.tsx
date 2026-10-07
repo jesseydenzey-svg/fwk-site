@@ -10,13 +10,15 @@ export type CartItem = {
   customization: string | null;
   price: number | null;
   status: "in_stock" | "preorder";
+  quantity: number;
 };
 
 type CartContextValue = {
   items: CartItem[];
   ready: boolean;
-  addItem: (item: Omit<CartItem, "id">) => void;
+  addItem: (item: Omit<CartItem, "id" | "quantity">) => void;
   removeItem: (id: string) => void;
+  updateQuantity: (id: string, quantity: number) => void;
 };
 
 const CartContext = createContext<CartContextValue | null>(null);
@@ -30,7 +32,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
     const timer = setTimeout(() => {
       try {
         const saved = window.localStorage.getItem(storageKey);
-        if (saved) setItems(JSON.parse(saved) as CartItem[]);
+        if (saved) {
+          const parsed = JSON.parse(saved) as CartItem[];
+          setItems(parsed.map((item) => ({ ...item, quantity: item.quantity ?? 1 })));
+        }
       } catch {
         window.localStorage.removeItem(storageKey);
       }
@@ -47,8 +52,31 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const value: CartContextValue = {
     items,
     ready,
-    addItem: (item) => setItems((current) => [...current, { ...item, id: crypto.randomUUID() }]),
+    addItem: (item) =>
+      setItems((current) => {
+        const existingIndex = current.findIndex(
+          (entry) =>
+            entry.productId === item.productId &&
+            entry.modelName === item.modelName &&
+            entry.customization === item.customization
+        );
+        if (existingIndex >= 0) {
+          const next = [...current];
+          next[existingIndex] = {
+            ...next[existingIndex],
+            quantity: next[existingIndex].quantity + 1,
+          };
+          return next;
+        }
+        return [...current, { ...item, id: crypto.randomUUID(), quantity: 1 }];
+      }),
     removeItem: (id) => setItems((current) => current.filter((item) => item.id !== id)),
+    updateQuantity: (id, quantity) =>
+      setItems((current) =>
+        current.map((item) =>
+          item.id === id ? { ...item, quantity: Math.max(1, quantity) } : item
+        )
+      ),
   };
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

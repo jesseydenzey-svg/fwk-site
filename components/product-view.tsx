@@ -195,7 +195,7 @@ export default function ProductView({
             <div className="mt-8 grid grid-cols-2 gap-3 border-t border-white/10 pt-6">
               <div className="flex items-center gap-3 rounded-xl border border-white/5 bg-[var(--surface)]/50 p-3">
                 <Truck size={20} className="shrink-0 text-[var(--accent-light)]" />
-                <span className="text-xs text-[var(--muted)]">Livraison rapide au Cameroun</span>
+               <span className="text-xs text-[var(--muted)]">Livraison express partout au Cameroun, au frais du client</span> 
               </div>
               <div className="flex items-center gap-3 rounded-xl border border-white/5 bg-[var(--surface)]/50 p-3">
                 <ShieldCheck size={20} className="shrink-0 text-[var(--accent-light)]" />

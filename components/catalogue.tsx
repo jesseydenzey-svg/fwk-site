@@ -1,11 +1,12 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { AlertTriangle, ChevronDown, MessageCircle, RefreshCw, Search, ShoppingBag, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import SiteHeader from "@/components/site-header";
+import HeroShowcase from "@/components/hero-showcase";
 import { useCart } from "@/components/cart-provider";
 import RevealOnScroll from "@/components/reveal-on-scroll";
 import {
@@ -122,16 +123,20 @@ export default function Catalogue({
       <SiteHeader />
 
       <main className="mx-auto max-w-6xl px-5 pb-28 pt-8 sm:pt-14">
-        <section className="max-w-2xl">
-          <p className="mb-3 text-xs font-bold uppercase tracking-[0.2em] text-[var(--accent-light)]">
-            FRANCK WATAT CASE
-          </p>
-          <h1 className="font-heading text-5xl font-bold uppercase leading-[0.95] sm:text-7xl">
-            Ton style. Ton iPhone.
-          </h1>
-          <p className="mt-4 max-w-xl text-base leading-7 text-[var(--muted)]">
-            Des coques sport et anime pensées pour accompagner chaque match, chaque partie et chaque journée.
-          </p>
+        <section className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
+          <div className="max-w-2xl">
+            <p className="mb-3 text-xs font-bold uppercase tracking-[0.2em] text-[var(--accent-light)]">
+              FRANCK WATAT CASE
+            </p>
+            <h1 className="font-heading text-5xl font-bold uppercase leading-[0.95] sm:text-7xl">
+              Ton style. Ton iPhone.
+            </h1>
+            <p className="mt-4 max-w-xl text-base leading-7 text-[var(--muted)]">
+              Des coques sport et anime pensées pour accompagner chaque match, chaque partie et chaque journée.
+            </p>
+          </div>
+
+          <HeroShowcase products={cases} />
         </section>
 
         <section className="mt-6">
