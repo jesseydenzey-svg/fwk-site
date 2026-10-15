@@ -9,6 +9,7 @@ import SiteHeader from "@/components/site-header";
 import HeroShowcase from "@/components/hero-showcase";
 import { useCart } from "@/components/cart-provider";
 import RevealOnScroll from "@/components/reveal-on-scroll";
+import PriceCountUp from "@/components/price-count-up";
 import {
   formatPrice,
   isModelMatch,
@@ -433,7 +434,7 @@ function ProductCard({ product }: { product: Product }) {
             type="button"
             onClick={handleQuickAdd}
             aria-label="Ajouter au panier"
-            className={`absolute bottom-2 right-2 z-10 flex size-10 items-center justify-center rounded-full bg-[var(--accent)] text-white shadow-lg transition-transform active:scale-90 ${
+            className={`cart-pulse absolute bottom-2 right-2 z-10 flex size-10 items-center justify-center rounded-full bg-[var(--accent)] text-white shadow-lg transition-transform active:scale-90 ${
               justAdded ? "scale-110" : "scale-100"
             }`}
           >
@@ -459,7 +460,7 @@ function ProductCard({ product }: { product: Product }) {
         )}
         <div className="mt-auto pt-3 sm:pt-4">
           <p className="font-heading text-lg font-bold text-white sm:text-2xl">
-            {priceKnown ? formatPrice(product.price) : "Prix à confirmer"}
+            {priceKnown ? <PriceCountUp value={product.price as number} /> : "Prix à confirmer"}
           </p>
         </div>
       </div>

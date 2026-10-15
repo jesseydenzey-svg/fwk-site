@@ -185,7 +185,7 @@ export default function ProductView({
                 type="button"
                 onClick={handleAddToCart}
                 disabled={!priceKnown}
-                className="flex min-h-[48px] w-full items-center justify-center gap-3 rounded-xl bg-[#1E6BFF] px-6 text-base font-bold uppercase tracking-wider text-white shadow-lg transition-transform duration-150 hover:bg-[#1E6BFF]/90 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50"
+                className={`flex min-h-[48px] w-full items-center justify-center gap-3 rounded-xl bg-[#1E6BFF] px-6 text-base font-bold uppercase tracking-wider text-white shadow-lg transition-transform duration-150 hover:bg-[#1E6BFF]/90 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50${priceKnown ? " cart-pulse" : ""}`}
               >
                 <ShoppingBag size={20} />
                 <span>{priceKnown ? "Ajouter au panier" : "Prix à confirmer"}</span>
@@ -263,7 +263,7 @@ export default function ProductView({
             type="button"
             onClick={handleAddToCart}
             disabled={!priceKnown}
-            className="flex min-h-[48px] flex-1 items-center justify-center gap-2 rounded-xl bg-[#1E6BFF] px-4 text-sm font-bold uppercase tracking-wider text-white shadow-lg active:scale-98 disabled:cursor-not-allowed disabled:opacity-50"
+            className={`flex min-h-[48px] flex-1 items-center justify-center gap-2 rounded-xl bg-[#1E6BFF] px-4 text-sm font-bold uppercase tracking-wider text-white shadow-lg active:scale-98 disabled:cursor-not-allowed disabled:opacity-50${priceKnown ? " cart-pulse" : ""}`}
           >
             <ShoppingBag size={18} />
             <span>{!priceKnown ? "Prix à confirmer" : added ? "Ajouté !" : "Ajouter au panier"}</span>

@@ -152,6 +152,13 @@ export default function EditProductPage({
       return;
     }
 
+    if (productType !== "case" && isActive && !price.trim()) {
+      setError(
+        "Un produit actif doit avoir un prix. Renseigne un prix, ou décoche la case de visibilité."
+      );
+      return;
+    }
+
     setSubmitting(true);
     setError(null);
 
@@ -546,7 +553,19 @@ export default function EditProductPage({
             id="is_active_edit"
             type="checkbox"
             checked={isActive}
-            onChange={(e) => setIsActive(e.target.checked)}
+            onChange={(e) => {
+              if (
+                e.target.checked &&
+                productType !== "case" &&
+                !price.trim()
+              ) {
+                setError(
+                  "Un produit actif doit avoir un prix. Renseigne un prix, ou décoche la case de visibilité."
+                );
+                return;
+              }
+              setIsActive(e.target.checked);
+            }}
             className="size-5 rounded border-white/20 bg-[#0E1116] text-[var(--accent)] focus:ring-0"
           />
           <label

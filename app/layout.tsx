@@ -34,12 +34,14 @@ export const metadata: Metadata = {
 
 import { CartProvider } from "@/components/cart-provider";
 import FloatingCartButton from "@/components/floating-cart-button";
+import IntroSplash from "@/components/intro-splash";
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="fr" className={`${headingFont.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col bg-[#0e1116] text-[#edf3ff]">
         <CartProvider>
+          <IntroSplash />
           {children}
           <FloatingCartButton />
         </CartProvider>

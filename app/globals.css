@@ -67,3 +67,100 @@ button, a { -webkit-tap-highlight-color: transparent; }
     animation: none;
   }
 }
+
+/* ── Intro Splash ─────────────────────────────────── */
+.intro-splash {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #0E1116;
+  opacity: 1;
+  transition: opacity 500ms ease-out;
+}
+.intro-splash--fading {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.intro-splash__logo-ring {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 110px;
+  height: 110px;
+  border-radius: 9999px;
+  background: #0E1116;
+}
+.intro-splash__logo-ring::before {
+  content: "";
+  position: absolute;
+  inset: -3px;
+  border-radius: 9999px;
+  background: conic-gradient(#1E6BFF, #4D8DFF, transparent 70%);
+  animation: intro-ring-spin 1.2s linear infinite;
+  z-index: -1;
+}
+.intro-splash__logo-img {
+  width: 80px;
+  height: 80px;
+  border-radius: 9999px;
+  object-fit: contain;
+}
+
+.intro-splash__brand {
+  margin-top: 1rem;
+  font-family: var(--font-heading), ui-sans-serif, system-ui, sans-serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: #fff;
+}
+
+.intro-splash__dots {
+  display: flex;
+  gap: 6px;
+  margin-top: 1rem;
+}
+.intro-splash__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background: #4D8DFF;
+  animation: intro-dot-pulse 1s ease-in-out infinite;
+}
+.intro-splash__dot:nth-child(2) { animation-delay: 0.2s; }
+.intro-splash__dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes intro-ring-spin {
+  to { transform: rotate(360deg); }
+}
+@keyframes intro-dot-pulse {
+  0%, 100% { opacity: 0.3; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.4); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .intro-splash { transition: none; }
+  .intro-splash__logo-ring::before { animation: none; }
+  .intro-splash__dot { animation: none; opacity: 0.6; }
+}
+
+/* ── Cart-pulse: subtle halo on add-to-cart buttons ── */
+@keyframes cart-pulse-halo {
+  0% { box-shadow: 0 0 0 0 rgba(30, 107, 255, 0.45); }
+  70% { box-shadow: 0 0 0 8px rgba(30, 107, 255, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(30, 107, 255, 0); }
+}
+.cart-pulse {
+  animation: cart-pulse-halo 2.2s ease-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cart-pulse { animation: none; }
+}

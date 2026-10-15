@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { supabase } from "@/lib/supabase";
 import type { IphoneModel, Product } from "@/lib/catalogue";
 import Catalogue from "@/components/catalogue";
