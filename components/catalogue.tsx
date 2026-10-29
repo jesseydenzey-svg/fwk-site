@@ -11,10 +11,12 @@ import { useCart } from "@/components/cart-provider";
 import RevealOnScroll from "@/components/reveal-on-scroll";
 import PriceCountUp from "@/components/price-count-up";
 import {
+  applyDiscount,
   formatPrice,
   isModelMatch,
   type IphoneModel,
   type Product,
+  type Promotion,
 } from "@/lib/catalogue";
 
 const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER;
@@ -22,10 +24,12 @@ const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER;
 export default function Catalogue({
   models,
   products,
+  promotion,
   errorMessage,
 }: {
   models: IphoneModel[];
   products: Product[];
+  promotion?: Promotion | null;
   errorMessage: string | null;
 }) {
   const router = useRouter();
@@ -130,7 +134,7 @@ export default function Catalogue({
               FRANCK WATAT CASE
             </p>
             <h1 className="font-heading text-5xl font-bold uppercase leading-[0.95] sm:text-7xl">
-              Ton style. Ton iPhone.
+              Ton style. Ton téléphone.
             </h1>
             <p className="mt-4 max-w-xl text-base leading-7 text-[var(--muted)]">
               Des coques sport et anime pensées pour accompagner chaque match, chaque partie et chaque journée.
@@ -139,6 +143,36 @@ export default function Catalogue({
 
           <HeroShowcase products={cases} />
         </section>
+
+        {promotion && promotion.is_active && promotion.discount_percent > 0 && (
+          <section className="mt-8 relative overflow-hidden rounded-2xl bg-gradient-to-r from-red-600 via-orange-600 to-amber-500 p-5 sm:p-6 text-white shadow-xl shadow-orange-500/20 border border-white/20">
+            <div className="relative z-10 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-center gap-4">
+                <span className="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-black/30 backdrop-blur-md text-3xl font-black shadow-inner">
+                  🔥
+                </span>
+                <div>
+                  <span className="inline-block rounded-full bg-black/35 px-3 py-0.5 text-xs font-bold uppercase tracking-wider backdrop-blur-sm">
+                    Offre Flash
+                  </span>
+                  <div className="mt-1 flex flex-wrap items-baseline gap-2.5">
+                    <span className="font-heading text-3xl sm:text-5xl font-black tracking-tight drop-shadow-sm">
+                      -{promotion.discount_percent}%
+                    </span>
+                    <span className="font-heading text-lg sm:text-2xl font-bold uppercase tracking-wide opacity-95">
+                      {promotion.label}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div className="flex items-center">
+                <span className="rounded-xl bg-black/30 px-4 py-2 text-xs font-bold uppercase tracking-wider text-white backdrop-blur-sm border border-white/10">
+                  Remise automatique au panier
+                </span>
+              </div>
+            </div>
+          </section>
+        )}
 
         <section className="mt-6">
           <div className="relative">
@@ -164,7 +198,7 @@ export default function Catalogue({
                 Filtrer le catalogue
               </p>
               <h2 id="model-title" className="font-heading text-2xl font-bold uppercase text-white">
-                Quel est ton iPhone ?
+                Quel est ton téléphone ?
               </h2>
             </div>
           </div>
@@ -190,7 +224,7 @@ export default function Catalogue({
                   La sélection FWK
                 </p>
                 <h2 id="catalogue-title" className="font-heading text-3xl font-bold uppercase sm:text-4xl">
-                  Coques iPhone
+                  Nos coques
                 </h2>
               </div>
               {ready && !errorMessage && (
@@ -208,7 +242,7 @@ export default function Catalogue({
             ) : visibleCases.length ? (
               <div className="mt-6 grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-3">
                 {visibleCases.map((product) => (
-                  <ProductCard key={product.id} product={product} />
+                  <ProductCard key={product.id} product={product} promotion={promotion} />
                 ))}
               </div>
             ) : (
@@ -240,7 +274,7 @@ export default function Catalogue({
 
               <div className="mt-6 grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-3">
                 {visibleOtherProducts.map((product) => (
-                  <ProductCard key={product.id} product={product} />
+                  <ProductCard key={product.id} product={product} promotion={promotion} />
                 ))}
               </div>
             </section>
@@ -289,7 +323,7 @@ export default function Catalogue({
           >
             <div className="flex items-center justify-between border-b border-white/10 pb-4">
               <h2 id="sheet-title" className="font-heading text-2xl font-bold uppercase text-white">
-                Choisis ton iPhone
+                Choisis ton téléphone
               </h2>
               <button
                 type="button"
@@ -363,7 +397,7 @@ export default function Catalogue({
             <textarea
               value={preorderText}
               onChange={(e) => setPreorderText(e.target.value)}
-              placeholder="Ex. coque iPhone 16 Pro Max, design PSG, ou bracelet Lakers..."
+              placeholder="Ex. coque iPhone 16 Pro Max, Samsung Galaxy S23, design PSG, ou bracelet Lakers..."
               rows={4}
               className="mt-4 w-full rounded-xl border border-white/15 bg-[var(--surface-strong)] p-3 text-sm text-white placeholder:text-white/30 focus:border-[var(--accent)] focus:outline-none"
             />
@@ -383,13 +417,29 @@ export default function Catalogue({
   );
 }
 
-function ProductCard({ product }: { product: Product }) {
+function ProductCard({
+  product,
+  promotion,
+}: {
+  product: Product;
+  promotion?: Promotion | null;
+}) {
   const { addItem } = useCart();
   const [justAdded, setJustAdded] = useState(false);
   const isCase = product.product_type === "case";
   const isBracelet = product.category?.slug === "bracelets";
   const priceKnown = product.price !== null;
   const showQuickAdd = !isBracelet && priceKnown;
+
+  const hasDiscount = Boolean(
+    promotion?.is_active &&
+      promotion.discount_percent > 0 &&
+      priceKnown &&
+      product.price !== null
+  );
+  const discountedPrice = hasDiscount
+    ? applyDiscount(product.price, promotion?.discount_percent)
+    : product.price;
 
   function handleQuickAdd(e: React.MouseEvent) {
     e.preventDefault();
@@ -399,9 +449,9 @@ function ProductCard({ product }: { product: Product }) {
     addItem({
       productId: product.id,
       name: product.name,
-      modelName: isCase && product.model ? `iPhone ${product.model}` : null,
+      modelName: isCase && product.model ? product.model : null,
       customization: null,
-      price: product.price,
+      price: discountedPrice,
       status: "in_stock",
     });
     setJustAdded(true);
@@ -445,13 +495,13 @@ function ProductCard({ product }: { product: Product }) {
 
       <div className="flex flex-1 flex-col p-3 sm:p-5">
         <p className="text-xs font-bold uppercase tracking-[0.15em] text-[var(--accent-light)]">
-          {product.category?.name ?? (isCase ? "Coque iPhone" : "Accessoire")}
+          {product.category?.name ?? (isCase ? "Coque" : "Accessoire")}
         </p>
         <h3 className="mt-1 font-heading text-base font-bold uppercase leading-tight text-white sm:mt-2 sm:text-2xl">
           {product.name}
         </h3>
         {isCase && product.model && (
-          <p className="mt-1 text-xs font-semibold text-white/60">iPhone {product.model}</p>
+          <p className="mt-1 text-xs font-semibold text-white/60">{product.model}</p>
         )}
         {product.description && (
           <p className="mt-2 hidden line-clamp-2 text-sm leading-6 text-[var(--muted)] sm:block">
@@ -459,9 +509,26 @@ function ProductCard({ product }: { product: Product }) {
           </p>
         )}
         <div className="mt-auto pt-3 sm:pt-4">
-          <p className="font-heading text-lg font-bold text-white sm:text-2xl">
-            {priceKnown ? <PriceCountUp value={product.price as number} /> : "Prix à confirmer"}
-          </p>
+          {priceKnown ? (
+            hasDiscount && discountedPrice !== null ? (
+              <div className="flex flex-wrap items-baseline gap-2">
+                <span className="text-xs sm:text-sm font-semibold text-white/50 line-through">
+                  {formatPrice(product.price)}
+                </span>
+                <span className="font-heading text-lg font-bold text-white sm:text-2xl">
+                  {formatPrice(discountedPrice)}
+                </span>
+              </div>
+            ) : (
+              <p className="font-heading text-lg font-bold text-white sm:text-2xl">
+                <PriceCountUp value={product.price as number} />
+              </p>
+            )
+          ) : (
+            <p className="font-heading text-lg font-bold text-white sm:text-2xl">
+              Prix à confirmer
+            </p>
+          )}
         </div>
       </div>
     </Link>

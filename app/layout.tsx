@@ -16,10 +16,10 @@ const metadataBase = new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://fwk.ex
 export const metadata: Metadata = {
   metadataBase,
   title: "FRANCK WATAT CASE | Coques sport et anime",
-  description: "Coques d'iPhone, accessoires sport et designs anime par FRANCK WATAT CASE.",
+  description: "Coques de téléphone, accessoires sport et designs anime par FRANCK WATAT CASE.",
   openGraph: {
     title: "FRANCK WATAT CASE | Coques sport et anime",
-    description: "Découvre les designs FRANCK WATAT CASE pour ton iPhone.",
+    description: "Découvre les designs FRANCK WATAT CASE pour ton téléphone.",
     locale: "fr_FR",
     type: "website",
     images: [{ url: new URL("/opengraph-image.png", metadataBase).toString(), width: 1200, height: 630, alt: "FRANCK WATAT CASE" }],
@@ -27,7 +27,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "FRANCK WATAT CASE | Coques sport et anime",
-    description: "Découvre les designs FRANCK WATAT CASE pour ton iPhone.",
+    description: "Découvre les designs FRANCK WATAT CASE pour ton téléphone.",
     images: ["/opengraph-image.png"],
   },
 };

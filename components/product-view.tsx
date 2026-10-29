@@ -15,18 +15,23 @@ import {
 import SiteHeader from "@/components/site-header";
 import { useCart } from "@/components/cart-provider";
 import {
+  applyDiscount,
   formatPrice,
   isBracelet,
   type IphoneModel,
   type Product,
+  type Promotion,
 } from "@/lib/catalogue";
 import { getWhatsAppNumber } from "@/lib/whatsapp";
 
 export default function ProductView({
   product,
+  models,
+  promotion,
 }: {
   product: Product;
   models: IphoneModel[];
+  promotion?: Promotion | null;
 }) {
   const { addItem } = useCart();
   const [customization, setCustomization] = useState("");
@@ -37,15 +42,25 @@ export default function ProductView({
   const isBraceletType = isBracelet(product);
   const priceKnown = product.price !== null;
 
+  const hasDiscount = Boolean(
+    promotion?.is_active &&
+      promotion.discount_percent > 0 &&
+      priceKnown &&
+      product.price !== null
+  );
+  const discountedPrice = hasDiscount
+    ? applyDiscount(product.price, promotion?.discount_percent)
+    : product.price;
+
   const handleAddToCart = () => {
     if (!priceKnown) return;
 
     addItem({
       productId: product.id,
       name: product.name,
-      modelName: isCaseType ? (product.model ? `iPhone ${product.model}` : null) : null,
+      modelName: isCaseType ? (product.model ? product.model : null) : null,
       customization: isBraceletType && customization.trim() ? customization.trim() : null,
-      price: product.price,
+      price: discountedPrice,
       status: "in_stock",
     });
 
@@ -100,7 +115,7 @@ export default function ProductView({
 
           <div className="flex flex-col">
             <p className="text-xs font-bold uppercase tracking-[0.2em] text-[var(--accent-light)]">
-              {product.category?.name ?? (isCaseType ? "Coque iPhone" : isBraceletType ? "Bracelet" : "Accessoire")}
+              {product.category?.name ?? (isCaseType ? "Coque" : isBraceletType ? "Bracelet" : "Accessoire")}
             </p>
             <h1 className="mt-2 font-heading text-3xl font-bold uppercase leading-tight text-white sm:text-5xl">
               {product.name}
@@ -108,14 +123,30 @@ export default function ProductView({
 
             {isCaseType && product.model && (
               <p className="mt-2 text-sm font-semibold text-white/70">
-                Compatible iPhone {product.model}
+                Compatible avec {product.model}
               </p>
             )}
 
-            <div className="mt-4 flex items-baseline gap-3">
-              <span className="font-heading text-3xl font-bold text-white sm:text-4xl">
-                {displayPrice}
-              </span>
+            <div className="mt-4 flex flex-wrap items-baseline gap-3">
+              {priceKnown && hasDiscount && discountedPrice !== null ? (
+                <>
+                  <span className="text-base sm:text-lg font-semibold text-white/50 line-through">
+                    {formatPrice(product.price)}
+                  </span>
+                  <span className="font-heading text-3xl font-bold text-white sm:text-4xl">
+                    {formatPrice(discountedPrice)}
+                  </span>
+                  {promotion && (
+                    <span className="rounded-full bg-gradient-to-r from-red-600 to-orange-500 px-3 py-1 text-xs font-extrabold uppercase tracking-wider text-white shadow-sm">
+                      -{promotion.discount_percent}%
+                    </span>
+                  )}
+                </>
+              ) : (
+                <span className="font-heading text-3xl font-bold text-white sm:text-4xl">
+                  {displayPrice}
+                </span>
+              )}
               {priceKnown && (
                 <span className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-xs font-bold uppercase tracking-wider text-emerald-400">
                   En stock
@@ -216,7 +247,7 @@ export default function ProductView({
                 Tu ne trouves pas ce que tu cherches ? Précommande sur WhatsApp
               </h2>
               <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
-                Un joueur en particulier ? Un club, un personnage d&apos;anime ou ton propre design pour ton iPhone ?
+                Un joueur en particulier ? Un club, un personnage d&apos;anime ou ton propre design pour ton téléphone ?
                 Écris ta demande ci-dessous et contacte-nous directement sur WhatsApp.
               </p>
 
@@ -232,7 +263,7 @@ export default function ProductView({
                   value={whatsappDesc}
                   onChange={(e) => setWhatsappDesc(e.target.value)}
                   rows={2}
-                  placeholder="Ex : Je veux ce design adapté pour iPhone 14 Pro avec mon prénom 'Arthur' au dos..."
+                  placeholder="Ex : Je veux ce design adapté pour iPhone 14 Pro ou Samsung Galaxy S23 avec mon prénom 'Arthur' au dos..."
                   className="w-full rounded-xl border border-white/15 bg-[var(--surface-strong)] p-3 text-sm text-white placeholder-white/35 outline-none transition focus:border-emerald-500"
                 />
               </div>
@@ -257,7 +288,18 @@ export default function ProductView({
         <div className="flex items-center gap-4">
           <div className="shrink-0">
             <p className="text-[10px] uppercase tracking-wider text-[var(--muted)]">Total</p>
-            <p className="font-heading text-xl font-bold text-white">{displayPrice}</p>
+            {priceKnown && hasDiscount && discountedPrice !== null ? (
+              <div className="flex items-baseline gap-1.5">
+                <span className="text-xs font-semibold text-white/50 line-through">
+                  {formatPrice(product.price)}
+                </span>
+                <p className="font-heading text-xl font-bold text-white">
+                  {formatPrice(discountedPrice)}
+                </p>
+              </div>
+            ) : (
+              <p className="font-heading text-xl font-bold text-white">{displayPrice}</p>
+            )}
           </div>
           <button
             type="button"

@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import {
   AlertTriangle,
   ExternalLink,
+  Flame,
   LogOut,
   Plus,
   RefreshCw,
@@ -136,6 +137,13 @@ export default function AdminPage() {
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
+          <Link
+            href="/admin/promotions"
+            className="inline-flex min-h-[48px] items-center gap-2 rounded-xl border border-orange-500/30 bg-orange-500/10 px-4 text-sm font-bold text-orange-300 transition hover:bg-orange-500/20 shadow-sm"
+          >
+            <Flame size={18} className="text-orange-400" />
+            <span>Promotions</span>
+          </Link>
           <Link
             href="/"
             target="_blank"
@@ -282,7 +290,7 @@ export default function AdminPage() {
                 <div className="min-w-0">
                   <p className="truncate font-semibold text-white">{product.name}</p>
                   <p className="text-xs text-[var(--muted)]">
-                    {product.model ? `iPhone ${product.model}` : "Modèle universel"} ·{" "}
+                    {product.model ? product.model : "Modèle universel"} ·{" "}
                     <span className="font-semibold text-white">
                       {product.price ? `${new Intl.NumberFormat("fr-FR").format(product.price)} FCFA` : "Prix non défini"}
                     </span>

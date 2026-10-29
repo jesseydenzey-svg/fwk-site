@@ -18,11 +18,28 @@ export type Product = {
   is_active?: boolean;
 };
 
+export type Promotion = {
+  id: string;
+  label: string;
+  discount_percent: number;
+  is_active: boolean;
+  created_at?: string;
+};
+
+export function applyDiscount(
+  price: number | null | undefined,
+  percent: number | null | undefined
+): number | null {
+  if (price === null || price === undefined) return null;
+  if (!percent || percent <= 0) return price;
+  const discounted = price * (1 - percent / 100);
+  return Math.round(discounted);
+}
+
 export function normalizeModelName(name: string | null | undefined): string {
   if (!name) return "";
   return name
     .toLowerCase()
-    .replace(/^iphone\s*/i, "")
     .replace(/\s+/g, " ")
     .trim();
 }

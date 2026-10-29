@@ -78,8 +78,7 @@ export default function NewProductPage() {
           setModels(modRes.data);
           if (modRes.data.length > 0) {
             // default model
-            const norm = modRes.data[0].name.replace(/^iphone\s*/i, "").trim();
-            setModel(norm);
+            setModel(modRes.data[0].name);
           }
         }
       })
@@ -303,7 +302,7 @@ export default function NewProductPage() {
               }
               className="w-full rounded-xl border border-white/10 bg-[#0E1116] px-4 py-3 text-sm text-white outline-none transition focus:border-[var(--accent)]"
             >
-              <option value="case">Coque iPhone (case)</option>
+              <option value="case">Coque (case)</option>
               <option value="bracelet">Bracelet (personnalisable)</option>
               <option value="other">Autre produit / Accessoire</option>
             </select>
@@ -329,11 +328,11 @@ export default function NewProductPage() {
           </div>
         </div>
 
-        {/* Modèle iPhone (uniquement pour les coques) */}
+        {/* Modèle de téléphone (uniquement pour les coques) */}
         {productType === "case" && (
           <div className="space-y-1.5">
             <label className="block text-xs font-bold uppercase tracking-wider text-white">
-              Modèle d&apos;iPhone associé *
+              Modèle de téléphone associé *
             </label>
             <div className="grid gap-3 sm:grid-cols-2">
               <select
@@ -342,26 +341,23 @@ export default function NewProductPage() {
                 className="w-full rounded-xl border border-white/10 bg-[#0E1116] px-4 py-3 text-sm text-white outline-none transition focus:border-[var(--accent)]"
               >
                 <option value="">Sélectionner un modèle...</option>
-                {models.map((m) => {
-                  const norm = m.name.replace(/^iphone\s*/i, "").trim();
-                  return (
-                    <option key={m.id} value={norm}>
-                      {m.name}
-                    </option>
-                  );
-                })}
+                {models.map((m) => (
+                  <option key={m.id} value={m.name}>
+                    {m.name}
+                  </option>
+                ))}
               </select>
 
               <input
                 type="text"
                 value={model}
                 onChange={(e) => setModel(e.target.value)}
-                placeholder="Ou saisir (ex : 16 Pro Max)"
+                placeholder="Ou saisir (ex : iPhone 13 Pro ou Samsung Galaxy S23)"
                 className="w-full rounded-xl border border-white/10 bg-[#0E1116] px-4 py-3 text-sm text-white outline-none transition focus:border-[var(--accent)]"
               />
             </div>
             <p className="text-[11px] text-[var(--muted)]">
-              Indique le format abrégé en base (ex : 12, 13 Pro, 15 Pro Max, 16).
+              Indique le modèle exact tel qu&apos;il doit s&apos;afficher, ex iPhone 13 Pro ou Samsung Galaxy S23.
             </p>
           </div>
         )}

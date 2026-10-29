@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import ProductView from "@/components/product-view";
-import type { IphoneModel, Product } from "@/lib/catalogue";
+import type { IphoneModel, Product, Promotion } from "@/lib/catalogue";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://fwk.example.com";
 const fallbackImage = `${siteUrl}/opengraph-image.png`;
@@ -60,7 +60,7 @@ export default async function ProductPage({
     notFound();
   }
 
-  const [productRes, modelsRes] = await Promise.all([
+  const [productRes, modelsRes, promoRes] = await Promise.all([
     supabase
       .from("products")
       .select(
@@ -72,6 +72,13 @@ export default async function ProductPage({
       .from("iphone_models")
       .select("id, name, sort_order")
       .order("sort_order"),
+    supabase
+      .from("promotions")
+      .select("*")
+      .eq("is_active", true)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle(),
   ]);
 
   if (productRes.error || !productRes.data) {
@@ -80,6 +87,7 @@ export default async function ProductPage({
 
   const product = productRes.data as unknown as Product;
   const models = (modelsRes.data ?? []) as unknown as IphoneModel[];
+  const promotion = (promoRes?.data as Promotion) ?? null;
 
-  return <ProductView product={product} models={models} />;
+  return <ProductView product={product} models={models} promotion={promotion} />;
 }
